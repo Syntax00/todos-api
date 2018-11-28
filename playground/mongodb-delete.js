@@ -15,7 +15,7 @@ MongoClient.connect('mongodb://localhost:27017/TodoApp', (error, client) => {
         console.log('result', result.result);
     });
 
-    // 1- .deleteMany using the promise
+    // 2- .deleteMany using the promise
     db.collection('Todos').deleteMany({ title: 'Eat lunch' }).then(result => {
         console.log('result', result.result);
     });
@@ -30,7 +30,7 @@ MongoClient.connect('mongodb://localhost:27017/TodoApp', (error, client) => {
         console.log('result', result.result);
     });
 
-    // 1- .deleteOne using the promise
+    // 2- .deleteOne using the promise
     db.collection('Todos').deleteOne({ title: 'Delete One (promise)' }).then(result => {
         console.log('result', result.result);
     });
@@ -46,7 +46,7 @@ MongoClient.connect('mongodb://localhost:27017/TodoApp', (error, client) => {
         console.log('result', result);
     });
 
-    // 1- .findOneAndDelete using the promise
+    // 2- .findOneAndDelete using the promise
     db.collection('Todos').findOneAndDelete({ title: 'Find One and Delete (promise)' }).then(result => {
         console.log('result', result);
     });
