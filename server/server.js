@@ -24,8 +24,10 @@ app.post('/todos', (request, response) => {
     todo.save().then(doc => {
         response.send(doc);
     }, error => {
-        response.send(error);
-    })
+        response.status(400).send(error);
+    });
 });
 
 app.listen(3000, () => console.log('Successfully connected to the server...'));
+
+module.exports = { app };
