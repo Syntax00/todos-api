@@ -21,11 +21,22 @@ app.post('/todos', (request, response) => {
     };
     let todo = new Todo(todoData);
     
-    todo.save().then(doc => {
-        response.send(doc);
+    todo.save().then(todo => {
+        response.send(todo);
     }, error => {
         response.status(400).send(error);
     });
+});
+
+// Create the GET endpoint for fetching all theo todos i.e GET /todos
+app.get('/todos', (request, response) => {
+    Todo.find().then(todos => {
+        response.send({
+            todos,
+        });
+    }, error => {
+        response.status(400).send(error);
+    })
 });
 
 app.listen(3000, () => console.log('Successfully connected to the server...'));
