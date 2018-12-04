@@ -39,6 +39,35 @@ app.get('/todos', (request, response) => {
     })
 });
 
+// Create the POST endpoint for adding a user
+app.post('/users', (request, response) => {
+    const { username, email, password } = request.body;
+    let userData = {
+        username,
+        email,
+        password,
+    };
+
+    let user = new User(userData);
+
+    user.save().then((user) => {
+        response.send(user);
+    }, (error) => {
+        response.status(400).send(error);
+    })
+});
+
+// Create the GET endpoint for getting all users
+app.get('/users', (request, response) => {
+    User.find().then((users) => {
+        response.send({
+            users,
+        });
+    }, (error) => {
+        response.status(400).send(error);
+    });
+});
+
 app.listen(3000, () => console.log('Successfully connected to the server...'));
 
 module.exports = { app };
