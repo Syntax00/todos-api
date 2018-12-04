@@ -1,6 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-
+const { ObjectID } = require('mongodb');
 
 const { mongoose } = require('./db/mongoose');
 const { Todo } = require('./models/todo');
@@ -39,6 +39,21 @@ app.get('/todos', (request, response) => {
     })
 });
 
+// Create the GET /todos/:id endpoint for getting a single todo
+app.get('/todos/:id', (request, response) => {
+    // To get the id, we need to use the "params" object on "request" i.e. request.params
+    let todoId = request.params.id;
+
+    if (!ObjectID.isValid(todoId)) return response.status(404).send();
+
+    Todo.findById(todoId).then((todo) => {
+        if (!todo) return response.status(400).send();
+        response.send({ todo });
+    }).catch((error) => {
+        response.status(400).send(error);
+    });
+});
+
 // Create the POST endpoint for adding a user
 app.post('/users', (request, response) => {
     const { username, email, password } = request.body;
@@ -67,6 +82,8 @@ app.get('/users', (request, response) => {
         response.status(400).send(error);
     });
 });
+
+
 
 app.listen(3000, () => console.log('Successfully connected to the server...'));
 
