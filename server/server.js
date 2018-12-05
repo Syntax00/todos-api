@@ -8,6 +8,7 @@ const { User } = require('./models/user');
 
 
 let app = express();
+const port = process.env.PORT || 3000;
 
 app.use(bodyParser.json()); // .use() is a function on express()'s object used for creating middlewares
 
@@ -54,6 +55,23 @@ app.get('/todos/:id', (request, response) => {
     });
 });
 
+// Create the DELETE /todos/:id endpoint for removing a certain todo
+app.delete('/todos/:id', (request, response) => {
+    let todoId = request.params.id;
+
+    if (!ObjectID.isValid(todoId)) return response.status(404).send();
+
+    Todo.findByIdAndRemove(todoId).then((removedTodo) => {
+        if (!removedTodo) return response.status(400).send();
+        
+        response.send({
+            removedTodo,
+        })
+    }).catch((error) => {
+        response.status(400).send(error);
+    });
+});
+
 // Create the POST endpoint for adding a user
 app.post('/users', (request, response) => {
     const { username, email, password } = request.body;
@@ -85,6 +103,6 @@ app.get('/users', (request, response) => {
 
 
 
-app.listen(3000, () => console.log('Successfully connected to the server...'));
+app.listen(port, () => console.log(`Successfully connected to the server on port ${port} ..`));
 
 module.exports = { app };

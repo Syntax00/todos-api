@@ -1,0 +1,23 @@
+1- Set dynamic port for the server:
+const port = process.env.PORT || 3000;
+
+
+2- Specifiy the start script for Heroku to start the application (in package.json > "scripts"):
+"scripts": {
+    "start": "node server/server.js",
+    ...
+    ...
+    ...
+}
+
+
+3- Add Node.js's version (in package.json > "scripts"):
+"engines": {
+    "node": "10.13.0"
+}
+
+
+4- Install MongoDB on Heroku (mLab MongoDB addon).
+
+
+5- > heroku create
