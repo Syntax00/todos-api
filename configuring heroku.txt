@@ -17,7 +17,8 @@ const port = process.env.PORT || 3000;
 }
 
 
-4- Install MongoDB on Heroku (mLab MongoDB addon).
+4- > heroku create
 
 
-5- > heroku create
+5- Install MongoDB on Heroku (mLab MongoDB addon):
+> heroku addons:create mongolab:sandbox

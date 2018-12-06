@@ -1,5 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const _ = require('lodash');
 const { ObjectID } = require('mongodb');
 
 const { mongoose } = require('./db/mongoose');
@@ -48,7 +49,7 @@ app.get('/todos/:id', (request, response) => {
     if (!ObjectID.isValid(todoId)) return response.status(404).send();
 
     Todo.findById(todoId).then((todo) => {
-        if (!todo) return response.status(400).send();
+        if (!todo) return response.status(404).send();
         response.send({ todo });
     }).catch((error) => {
         response.status(400).send(error);
@@ -62,7 +63,7 @@ app.delete('/todos/:id', (request, response) => {
     if (!ObjectID.isValid(todoId)) return response.status(404).send();
 
     Todo.findByIdAndRemove(todoId).then((removedTodo) => {
-        if (!removedTodo) return response.status(400).send();
+        if (!removedTodo) return response.status(404).send();
         
         response.send({
             removedTodo,
@@ -70,6 +71,24 @@ app.delete('/todos/:id', (request, response) => {
     }).catch((error) => {
         response.status(400).send(error);
     });
+});
+
+// Create the PATCH /todos/:id endpoint for updating a certain todo
+app.patch('/todos/:id', (request, response) => {
+    const todoId = request.params.id;
+    if (!ObjectID.isValid(todoId)) return response.status(404).send();
+
+    const updateObj = _.pick(request.body, ['title', 'description', 'completed']);
+
+    Todo.findByIdAndUpdate(todoId, { $set: updateObj }, { new: true }).then((updatedTodo) => {
+        if (!updatedTodo) return response.status(404).send();
+
+        response.send({
+            updatedTodo,
+        })
+    }).catch((error) => {
+        response.send(400).send(error);
+    })
 });
 
 // Create the POST endpoint for adding a user
