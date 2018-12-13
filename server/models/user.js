@@ -1,6 +1,7 @@
 const { mongoose } = require('../db/mongoose');
 const validator = require('validator');
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
 
 const schema = mongoose.Schema({
     username: {
@@ -48,6 +49,19 @@ const schema = mongoose.Schema({
 })
 
 // Document-level methods
+schema.pre('save', function (next) {
+    if (this.isModified('password')) {
+        bcrypt.genSalt(10, (error, salt) => {
+            bcrypt.hash(this.password, salt, (error, hash) => {
+                this.password = hash;
+                next();
+            });
+        });
+    } else {
+        next();
+    }
+});
+
 schema.methods.generateAuthToken = function () {
     let access = 'auth';
     let token = jwt.sign({ _id: this._id.toHexString(), access }, 'abc123').toString();
