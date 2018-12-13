@@ -6,7 +6,7 @@ const { ObjectID } = require('mongodb');
 const { mongoose } = require('./db/mongoose');
 const { Todo } = require('./models/todo');
 const { User } = require('./models/user');
-
+const { authenticate } = require('./middleware/auth');
 
 let app = express();
 const port = process.env.PORT || 3000;
@@ -116,7 +116,10 @@ app.get('/users', (request, response) => {
     });
 });
 
-
+// Create the GET endpoint for getting a user by token
+app.get('/users/me', authenticate, (request, response) => {
+    response.send(request.user);
+});
 
 app.listen(port, () => console.log(`Successfully connected to the server on port ${port} ..`));
 

@@ -47,6 +47,7 @@ const schema = mongoose.Schema({
     ]
 })
 
+// Document-level methods
 schema.methods.generateAuthToken = function () {
     let access = 'auth';
     let token = jwt.sign({ _id: this._id.toHexString(), access }, 'abc123').toString();
@@ -54,6 +55,23 @@ schema.methods.generateAuthToken = function () {
     this.tokens = this.tokens.concat([{ access, token }]);
 
     return this.save().then(doc => token);
+};
+
+// Model/Collection-level methods
+schema.statics.findByToken = function (token) {
+    let decoded;
+
+    try {
+        decoded = jwt.verify(token, 'abc123');
+    } catch (e) {
+        return Promise.reject();
+    }
+
+    return this.findById({
+        _id: decoded._id,
+        'tokens.token': token,
+        'tokens.auth': 'auth',
+    })
 };
 
 const User = mongoose.model('User', schema);
