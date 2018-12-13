@@ -93,20 +93,16 @@ app.patch('/todos/:id', (request, response) => {
 
 // Create the POST endpoint for adding a user
 app.post('/users', (request, response) => {
-    const { username, email, password } = request.body;
-    let userData = {
-        username,
-        email,
-        password,
-    };
-
+    let userData = _.pick(request.body, ['username', 'password', 'email', 'age']);
     let user = new User(userData);
-
+    
     user.save().then((user) => {
-        response.send(user);
-    }, (error) => {
-        response.status(400).send(error);
-    })
+        return user.generateAuthToken();
+    }).then((token) => {
+        response.header('x-auth', token).send(user);
+    }).catch((error) => {
+        response.status(400).send();
+    });
 });
 
 // Create the GET endpoint for getting all users
