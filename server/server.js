@@ -15,8 +15,10 @@ app.use(bodyParser.json()); // .use() is a function on express()'s object used f
 
 
 // Create the POST endpoint for adding a todo i.e. POST /todos
-app.post('/todos', (request, response) => {
+app.post('/todos', authenticate, (request, response) => {
     let todoData = _.pick(request.body, ['title', 'description', 'completed']);
+    todoData._creator = request.user._id;
+    
     let todo = new Todo(todoData);
     
     todo.save().then(todo => {
@@ -27,8 +29,9 @@ app.post('/todos', (request, response) => {
 });
 
 // Create the GET endpoint for fetching all theo todos i.e GET /todos
-app.get('/todos', (request, response) => {
-    Todo.find().then(todos => {
+app.get('/todos', authenticate, (request, response) => {
+    console.log(request.user._id)
+    Todo.find({ _creator: request.user._id }).then(todos => {
         response.send({
             todos,
         });
@@ -38,13 +41,16 @@ app.get('/todos', (request, response) => {
 });
 
 // Create the GET /todos/:id endpoint for getting a single todo
-app.get('/todos/:id', (request, response) => {
+app.get('/todos/:id', authenticate, (request, response) => {
     // To get the id, we need to use the "params" object on "request" i.e. request.params
     let todoId = request.params.id;
 
     if (!ObjectID.isValid(todoId)) return response.status(404).send();
 
-    Todo.findById(todoId).then((todo) => {
+    Todo.findOne({
+        _id: todoId,
+        _creator: request.user._id,
+    }).then((todo) => {
         if (!todo) return response.status(404).send();
         response.send({ todo });
     }).catch((error) => {
@@ -53,12 +59,15 @@ app.get('/todos/:id', (request, response) => {
 });
 
 // Create the DELETE /todos/:id endpoint for removing a certain todo
-app.delete('/todos/:id', (request, response) => {
+app.delete('/todos/:id', authenticate, (request, response) => {
     let todoId = request.params.id;
 
     if (!ObjectID.isValid(todoId)) return response.status(404).send();
 
-    Todo.findByIdAndRemove(todoId).then((removedTodo) => {
+    Todo.findOneAndRemove({
+        _id: todoId,
+        _creator: request.user._id,
+    }).then((removedTodo) => {
         if (!removedTodo) return response.status(404).send();
         
         response.send({
@@ -70,13 +79,16 @@ app.delete('/todos/:id', (request, response) => {
 });
 
 // Create the PATCH /todos/:id endpoint for updating a certain todo
-app.patch('/todos/:id', (request, response) => {
+app.patch('/todos/:id', authenticate, (request, response) => {
     const todoId = request.params.id;
     if (!ObjectID.isValid(todoId)) return response.status(404).send();
 
     const updateObj = _.pick(request.body, ['title', 'description', 'completed']);
 
-    Todo.findByIdAndUpdate(todoId, { $set: updateObj }, { new: true }).then((updatedTodo) => {
+    Todo.findOneAndUpdate({
+        _id: todoId,
+        _creator: request.user._id,
+    }, { $set: updateObj }, { new: true }).then((updatedTodo) => {
         if (!updatedTodo) return response.status(404).send();
 
         response.send({
