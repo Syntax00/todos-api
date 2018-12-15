@@ -114,6 +114,20 @@ app.get('/users', (request, response) => {
     });
 });
 
+
+// Create the POST endpoint for loggin the user in
+app.post('/users/login', (request, response) => {
+    let loginInfo = _.pick(request.body, ['email', 'password']);
+
+    User.findByCredentials(loginInfo.email, loginInfo.password).then((user) => {
+        return user.generateAuthToken().then((token) => {
+            response.header('x-auth', token).send(user);
+        });
+    }).catch((error) => {
+        response.status(400).send();
+    });
+});
+
 // Create the GET endpoint for getting a user by token
 app.get('/users/me', authenticate, (request, response) => {
     response.send(request.user);

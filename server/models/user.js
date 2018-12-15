@@ -92,6 +92,24 @@ schema.statics.findByToken = function (token) {
     })
 };
 
+schema.statics.findByCredentials = function (email, password) {
+    return this.findOne({ email })
+        .then((user) => {
+            if (!user) return Promise.reject();
+            
+            return new Promise((resolve, reject) => {
+                bcrypt.compare(password, user.password, (error, result) => {
+                    if (error) return reject();
+    
+                    if (result) return resolve(user);
+                });
+            });
+        })
+        .catch((error) => {
+            return Promise.reject();
+        });
+};
+
 const User = mongoose.model('User', schema);
 
 
