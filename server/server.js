@@ -128,6 +128,15 @@ app.post('/users/login', (request, response) => {
     });
 });
 
+// Create the DELETE endpoint for logging the user out (Delete the current token)
+app.delete('/users/logout', authenticate, (request, response) => {
+    request.user.removeAuthToken(request.token).then(() => {
+        response.send(request.user);
+    }).catch((error) => {
+        response.status(400).send();
+    });
+});
+
 // Create the GET endpoint for getting a user by token
 app.get('/users/me', authenticate, (request, response) => {
     response.send(request.user);

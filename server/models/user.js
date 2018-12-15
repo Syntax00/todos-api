@@ -75,6 +75,16 @@ schema.methods.generateAuthToken = function () {
     return this.save().then(doc => token);
 };
 
+schema.methods.removeAuthToken = function (token) {
+    return this.update({
+        $pull : {
+            tokens: { token }
+        }
+    }).catch((error) => {
+        return Promise.reject();
+    });
+};
+
 // Model/Collection-level methods
 schema.statics.findByToken = function (token) {
     let decoded;
