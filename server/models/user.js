@@ -52,7 +52,11 @@ const schema = mongoose.Schema({
 schema.pre('save', function (next) {
     if (this.isModified('password')) {
         bcrypt.genSalt(10, (error, salt) => {
+            if (error) return console.log(error);
+
             bcrypt.hash(this.password, salt, (error, hash) => {
+                if (error) return console.log(error);
+
                 this.password = hash;
                 next();
             });

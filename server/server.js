@@ -16,11 +16,7 @@ app.use(bodyParser.json()); // .use() is a function on express()'s object used f
 
 // Create the POST endpoint for adding a todo i.e. POST /todos
 app.post('/todos', (request, response) => {
-    let todoData = {
-        title: request.body.title,
-        description: request.body.description,
-        completed: request.body.completed
-    };
+    let todoData = _.pick(request.body, ['title', 'description', 'completed']);
     let todo = new Todo(todoData);
     
     todo.save().then(todo => {
@@ -96,6 +92,8 @@ app.post('/users', (request, response) => {
     let userData = _.pick(request.body, ['username', 'password', 'email', 'age']);
     let user = new User(userData);
     
+    // The password's hash will be generating right here (before .save() gets called)
+
     user.save().then((user) => {
         return user.generateAuthToken();
     }).then((token) => {
